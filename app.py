@@ -1,10 +1,12 @@
 from flask import Flask, url_for, render_template, request, redirect, session
 from flask_sqlalchemy import SQLAlchemy
+from controllers.home_controller import home_controller
 
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///users.db'
 db = SQLAlchemy(app)
 
+app.register_blueprint(home_controller)
 
 class User(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -16,12 +18,12 @@ class User(db.Model):
         self.password = password
 
 
-@app.route('/', methods=['GET'])
-def index():
-    if session.get('logged_in'):
-        return render_template('home.html')
-    else:
-        return render_template('index.html', message="Hello!")
+# @app.route('/', methods=['GET'])
+# def index():
+#     if session.get('logged_in'):
+#         return render_template('home.html')
+#     else:
+#         return render_template('index.html', message="Hello!")
 
 
 @app.route('/register/', methods=['GET', 'POST'])
@@ -51,12 +53,15 @@ def login():
         return render_template('index.html', message="Incorrect Details")
 
 
-@app.route('/logout', methods=['GET', 'POST'])
-def logout():
-    session['logged_in'] = False
-    return redirect(url_for('index'))
+# @app.route('/logout', methods=['GET', 'POST'])
+# def logout():
+#     session['logged_in'] = False
+#     return redirect(url_for('index'))
 
 if(__name__ == '__main__'):
     app.secret_key = "ThisIsNotASecret:p"
-    db.create_all()
+    
+    with app.app_context():
+        db.create_all()
+
     app.run()
